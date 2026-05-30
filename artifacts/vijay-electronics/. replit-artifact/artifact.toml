@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Vijay Electronics"
+version = "1.0.0"
+id = "artifacts/vijay-electronics"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18659
+
+[services.development]
+run = "pnpm --filter @workspace/vijay-electronics run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/vijay-electronics", "run", "build" ]
+publicDir = "artifacts/vijay-electronics/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18659"
+BASE_PATH = "/"
