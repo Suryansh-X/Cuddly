@@ -26,25 +26,30 @@ if (!basePath) {
   );
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+const isReplId = process.env.REPL_ID !== undefined;
+
+let additionalPlugins: any[] = [];
+
+if (!isProduction && isReplId) {
+  const cartographerModule = await import("@replit/vite-plugin-cartographer");
+  const devBannerModule = await import("@replit/vite-plugin-dev-banner");
+  
+  additionalPlugins = [
+    cartographerModule.cartographer({
+      root: path.resolve(import.meta.dirname, ".."),
+    }),
+    devBannerModule.devBanner(),
+  ];
+}
+
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, ".."),
-            }),
-          ),
-          await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
-          ),
-        ]
-      : []),
+    ...additionalPlugins,
   ],
   resolve: {
     alias: {
